@@ -103,9 +103,9 @@ export async function addTodo(data) {
 	}
 }
 
-export async function editTodo(data) {
+export async function editTodo(todoId, data) {
 	try {
-		let response = await BaseAPI.post(EndPoints.allTodos, data);
+		let response = await BaseAPI.put(EndPoints.allTodos+"/"+todoId, data);
 		if (response.data) {
             console.log('editTodo ' + JSON.stringify(response.data))
 			return response.data;

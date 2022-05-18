@@ -14,7 +14,7 @@ import { WToast } from "react-native-smart-tip";
 const EditTodo = ({ route, navigation }) => {
     const [text, setText] = React.useState("");
     const [visible, setVisible] = React.useState(false);
-    const { title, userId } = route.params;
+    const { title, id } = route.params;
 
 
     const onDismissSnackBar = () => setVisible(false);
@@ -30,7 +30,7 @@ const EditTodo = ({ route, navigation }) => {
             completed: false
         };
         console.log("json ==>" + JSON.stringify(json));
-        const [data, error] = await promiseHandler(editTodo(json));
+        const [data, error] = await promiseHandler(editTodo(id, json));
 
         WToast.show({ data: "Added Successfully" });
         if (data) {

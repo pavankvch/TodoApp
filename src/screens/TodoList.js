@@ -6,14 +6,13 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
-  Image,StatusBar
+  Image,StatusBar, TouchableHighlight
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {deleteTodo, getAllTodos, promiseHandler} from '../api/ApiService';
+import {editTodo, deleteTodo, getAllTodos, promiseHandler} from '../api/ApiService';
 import {FloatingAction} from 'react-native-floating-action';
 import Toast from 'react-native-toast-message';
 import {Dropdown} from 'react-native-element-dropdown';
-import CustomAlertComponent from './CustomAlertComponent';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 const TodoList = ({navigation}) => {
@@ -49,6 +48,11 @@ const TodoList = ({navigation}) => {
 
   const TodoItem = ({item, index}) => {
     return (
+      <TouchableHighlight
+            onPress={() => console.log('You touched me')}
+            style={styles.rowFront}
+            underlayColor={'#AAA'}
+        >
       <View style={styles.container2}>
         <View style={styles.columnContainer}>
         {item.completed == true ?
@@ -67,7 +71,7 @@ const TodoList = ({navigation}) => {
             onPress={() => {
               navigation.navigate('EditTodo', {
                 title: item.title,
-                userId: item.userId,
+                id: item.id,
               });
             }}>
             <Image
@@ -77,6 +81,7 @@ const TodoList = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </View>
+      </TouchableHighlight>
     );
   };
 
@@ -112,6 +117,48 @@ const TodoList = ({navigation}) => {
     return true;
   };
 
+  const deleteRow = (rowMap, item) => {
+    // closeRow(rowMap, rowKey);
+    // const newData = [...listData];
+    // const prevIndex = listData.findIndex(item => item.key === rowKey);
+    // newData.splice(prevIndex, 1);
+    // setListData(newData);
+
+    completeTodoItemClick(item.id, item.title)
+
+
+};
+
+async function completeTodoItemClick(todoId, todoTitle) {
+  const json = {
+      title: todoTitle,
+      userId: 1,
+      completed: true
+  };
+
+  const [data, error] = await promiseHandler(editTodo(todoId, json));
+
+  if (data) {
+    console.log("json ==>" + JSON.stringify(json));
+  } else {
+      console.log(data?.errorMsg ?? error?.errorMsg ?? Strings.defaultError);
+  }
+}
+  const renderHiddenItem = (data, rowMap) => (
+    <View style={styles.rowBack}>
+        <TouchableOpacity
+            style={[styles.backRightBtn, styles.backRightBtnRight]}
+            onPress={() => deleteRow(rowMap, data.item)}
+        >
+            <Text style={styles.backTextWhite}>Completed</Text>
+        </TouchableOpacity>
+    </View>
+);
+
+const onRowDidOpen = rowKey => {
+  console.log('This row opened', rowKey);
+};
+
   return (
       
     <View style={styles.container}>
@@ -135,11 +182,21 @@ const TodoList = ({navigation}) => {
         }}
       />
       {todoData && (
-        <FlatList
-          data={todoData.filter(listFilter)}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-        />
+        // <FlatList
+        //   data={todoData.filter(listFilter)}
+        //   renderItem={renderItem}
+        //   keyExtractor={item => item.id}
+        // />
+
+        <SwipeListView
+        data={todoData.filter(listFilter)}
+        renderItem={renderItem}
+        renderHiddenItem={renderHiddenItem}
+        rightOpenValue={-80}
+        previewOpenValue={-30}
+        previewOpenDelay={2000}
+        onRowDidOpen={onRowDidOpen}
+    />
       )}
 
       <View style={styles.container}>
@@ -201,14 +258,12 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
   },
-
   selectedTextStyle: {
     fontSize: 16,
     marginLeft: 8,
   },
   placeholderStyle: {
     fontSize: 14,
-    //	backgroundColor:"green"
   },
   iconStyle: {
     width: 20,
@@ -220,6 +275,37 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Roboto'
   },
+  rowFront: {
+    backgroundColor: '#FFFFFF',
+    height: 50,
+},
+  rowBack: {
+    alignItems: 'center',
+    backgroundColor: '#DDD',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingLeft: 15,
+},
+backRightBtn: {
+    alignItems: 'center',
+    bottom: 0,
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 0,
+    width: 80,
+},
+backRightBtnLeft: {
+    backgroundColor: 'blue',
+    right: 75,
+},
+backRightBtnRight: {
+    backgroundColor: 'green',
+    right: 0,
+},
+backTextWhite: {
+  color: '#FFF',
+}
 });
 
 export default TodoList;

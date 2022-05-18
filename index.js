@@ -7,4 +7,4 @@ import App from './App';
 import {name as appName} from './app.json';
 import TodoList from './src/screens/TodoList';
 
-AppRegistry.registerComponent(appName, () => TodoList);
+AppRegistry.registerComponent(appName, () => App);

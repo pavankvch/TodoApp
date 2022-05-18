@@ -41,12 +41,12 @@ BaseAPI.interceptors.request.use(
 );
 BaseAPI.interceptors.response.use(
 	function (response) {
-		console.log(
-			"Response URL " +
-				response.config.url +
-				"\n Data " +
-				JSON.stringify(response.data)
-		);
+		// console.log(
+		// 	"Response URL " +
+		// 		response.config.url +
+		// 		"\n Data " +
+		// 		JSON.stringify(response.data)
+		// );
 		return response;
 	},
 	function (error) {
@@ -64,7 +64,7 @@ export async function getAllTodos() {
 	try {
 		let response = await BaseAPI.get(EndPoints.allTodos);
 		if (response.data) {
-            console.log('getAllTodos ' + response.data)
+            // console.log('getAllTodos ' + response.data)
 			return response.data;
 		} else {
 			return Promise.reject(response?.data);
@@ -107,7 +107,7 @@ export async function editTodo(data) {
 	try {
 		let response = await BaseAPI.post(EndPoints.allTodos, data);
 		if (response.data) {
-            console.log('addTodo ' + JSON.stringify(response.data))
+            console.log('editTodo ' + JSON.stringify(response.data))
 			return response.data;
 		} else {
 			return Promise.reject(response?.data);

@@ -6,14 +6,14 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
-  Image,StatusBar, TouchableHighlight
+  Image,StatusBar, TouchableHighlight, Alert
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {editTodo, deleteTodo, getAllTodos, promiseHandler} from '../api/ApiService';
 import {FloatingAction} from 'react-native-floating-action';
-import Toast from 'react-native-toast-message';
 import {Dropdown} from 'react-native-element-dropdown';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import Toast from 'react-native-simple-toast';
 
 const TodoList = ({navigation}) => {
   const [todoData, setTodoData] = useState([]);
@@ -37,6 +37,7 @@ const TodoList = ({navigation}) => {
   async function deleteTodoClick(todoId) {
     const [data, error] = await promiseHandler(deleteTodo(todoId));
     if (data) {
+      Toast.show("Task Deleted Successfully");
       // console.log("response getTodos" + JSON.stringify(data));
       // setTodoData(data)
     } else {
@@ -46,10 +47,24 @@ const TodoList = ({navigation}) => {
     
   }
 
+  const showCompleteTaskAlert = (item) =>
+    Alert.alert(
+      "Complete Task",
+      "Are you sure want to complete task",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => completeTodoItemClick(item.id, item.title)}
+      ]
+    );
+
   const TodoItem = ({item, index}) => {
     return (
       <TouchableHighlight
-            onPress={() => console.log('You touched me')}
+            onPress={() => showCompleteTaskAlert(item)}
             style={styles.rowFront}
             underlayColor={'#AAA'}
         >
@@ -117,12 +132,8 @@ const TodoList = ({navigation}) => {
     return true;
   };
 
-  const deleteRow = (rowMap, item) => {
-    // closeRow(rowMap, rowKey);
-    // const newData = [...listData];
-    // const prevIndex = listData.findIndex(item => item.key === rowKey);
-    // newData.splice(prevIndex, 1);
-    // setListData(newData);
+  const swipeRow = (rowMap, item) => {
+   
 
     completeTodoItemClick(item.id, item.title)
 
@@ -139,6 +150,7 @@ async function completeTodoItemClick(todoId, todoTitle) {
   const [data, error] = await promiseHandler(editTodo(todoId, json));
 
   if (data) {
+    Toast.show('Task completed');
     console.log("json ==>" + JSON.stringify(json));
   } else {
       console.log(data?.errorMsg ?? error?.errorMsg ?? Strings.defaultError);
@@ -148,7 +160,7 @@ async function completeTodoItemClick(todoId, todoTitle) {
     <View style={styles.rowBack}>
         <TouchableOpacity
             style={[styles.backRightBtn, styles.backRightBtnRight]}
-            onPress={() => deleteRow(rowMap, data.item)}
+            onPress={() => swipeRow(rowMap, data.item)}
         >
             <Text style={styles.backTextWhite}>Completed</Text>
         </TouchableOpacity>

@@ -8,7 +8,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { addTodo, promiseHandler } from "../api/ApiService";
 import { TextInput, Button, Snackbar } from 'react-native-paper';
-import { WToast } from "react-native-smart-tip";
+import Toast from 'react-native-simple-toast';
 
 
 const AddTodo = ({ navigation }) => {
@@ -27,7 +27,7 @@ const AddTodo = ({ navigation }) => {
         console.log("json ==>" + JSON.stringify(json));
         const [data, error] = await promiseHandler(addTodo(json));
 
-        WToast.show({ data: "Added Successfully" });
+        Toast.show("Task Added Successfully");
         if (data) {
             navigation.goBack()
         } else {
